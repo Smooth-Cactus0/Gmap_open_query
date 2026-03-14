@@ -92,6 +92,7 @@ npm run build
 - Re-check Google Maps Platform terms and any EEA-specific terms before public release or production use.
 
 More detail lives in [docs/compliance.md](./docs/compliance.md) and [docs/architecture.md](./docs/architecture.md).
+To launch the app locally with real keys and services, see [docs/launch-v1.md](./docs/launch-v1.md).
 
 ## Project status
 
