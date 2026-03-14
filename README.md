@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prospecting Console
 
-## Getting Started
+Prospecting Console is a self-hosted Google Places prospecting app built with Next.js, Prisma, BullMQ, PostgreSQL, and Redis. It helps an operator search a defined area, combine preset business types with keyword queries, filter for strong reviews and missing websites, and review the results inside a Google map + list workspace.
 
-First, run the development server:
+## What v1 includes
+
+- Address or city targeting with radius-based search
+- Curated business presets plus free-text keyword boosting
+- Filters for minimum rating, minimum review count, and missing website
+- Saved projects and historical runs
+- Google map workspace with export to CSV or JSON
+- BullMQ worker support with inline fallback
+- TTL-based storage for Google place snapshots
+
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- Prisma 7 with `@prisma/adapter-pg`
+- PostgreSQL
+- Redis + BullMQ
+- Tailwind CSS 4
+
+## Quick start
+
+1. Copy `.env.example` to `.env`.
+2. Fill in `GOOGLE_MAPS_API_KEY` and `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
+3. Start the infrastructure:
+
+```bash
+docker compose up -d db redis
+```
+
+4. Push the schema and generate the client:
+
+```bash
+npm install
+npm run prisma:generate
+npm run db:push
+```
+
+5. Start the app and worker:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run worker
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Docker Compose
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The repository includes a `docker-compose.yml` with:
 
-## Learn More
+- `db`: PostgreSQL 16
+- `redis`: Redis 7
+- `web`: Next.js app
+- `worker`: BullMQ worker
 
-To learn more about Next.js, take a look at the following resources:
+Run the full stack with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+docker compose up --build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
+See [.env.example](./.env.example) for the full list. The required ones are:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `DATABASE_URL`
+- `REDIS_URL`
+- `GOOGLE_MAPS_API_KEY`
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development commands
+
+```bash
+npm run dev
+npm run worker
+npm run lint
+npm run test
+npm run prisma:generate
+npm run db:push
+npm run build
+```
+
+## Compliance notes
+
+- This project is designed as an in-app qualification tool, not a durable Google-powered lead database.
+- Place snapshots are stored with a TTL. Projects and Place IDs can remain after snapshots expire.
+- Exports are generated on demand and are not retained server-side.
+- Re-check Google Maps Platform terms and any EEA-specific terms before public release or production use.
+
+More detail lives in [docs/compliance.md](./docs/compliance.md) and [docs/architecture.md](./docs/architecture.md).
+
+## Project status
+
+For a visual overview of what is implemented and what is still left, see [docs/status-summary.md](./docs/status-summary.md).
+
+![V1 Roadmap](./docs/assets/roadmap-v1.svg)
